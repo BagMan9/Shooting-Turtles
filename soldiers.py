@@ -3,16 +3,40 @@ import turtle
 import time
 
 
+# Initial Spawn
+def spawn(amt):
+    spawn.red_list = []
+    spawn.blue_list = []
+    for _ in range(amt):
+        spawn.red_list.append(turtle.Turtle())
+        spawn.blue_list.append(turtle.Turtle())
+    spawn.r_count = 0
+    spawn.b_count = 0
+    # Red spawn
+    for r in spawn.red_list:  # noinspection PyRedeclaration
+        spawn.r_count += 1
+        r.color("red")
+        r.penup()
+        r.goto(random.randrange(-350, -125), random.randrange(-200, 200))
+    # Blue spawn
+    for b in spawn.blue_list:  # noinspection PyRedeclaration
+        spawn.b_count += 1
+        b.color("blue")
+        b.penup()
+        b.goto(random.randrange(125, 350), random.randrange(-200, 200))
+        b.seth(180)
+
+
+# Main loop
 def main():
     movement(spawn.red_list, spawn.blue_list)
     if spawn.r_count != 0:
         bullet(random.choice(spawn.red_list))
     if spawn.b_count != 0:
         bullet(random.choice(spawn.blue_list))
-    else:
-        pass
 
 
+# Random movement
 def movement(red, blue):
     r_turtle = random.choice(red)
     if 20 < r_turtle.heading() < 340:
@@ -22,6 +46,28 @@ def movement(red, blue):
     b_turtle.seth(random.randrange(155, 205))
 
 
+# Main bullet function
+def bullet(shooter):
+    if random.randrange(0, 100) <= 2:
+        bul = shooter.clone()
+        bul.color("black")
+        bul.seth(shooter.heading())
+        travel = 0
+        while travel < 550:
+            bul.forward(5)
+            bul.pos()
+            travel += 5
+        if random.randrange(2) == 1:
+            make_real_bullet(bul, shooter, spawn.red_list, spawn.blue_list)
+        else:
+            bul.hideturtle()
+            bul.clear()
+            del bul
+    else:
+        pass
+
+
+# Bullet / soldier destruction
 def make_real_bullet(bul, shooter, red_list, blue_list):
     if shooter.color()[0] == "red":
         target = random.choice(blue_list)
@@ -57,52 +103,8 @@ def make_real_bullet(bul, shooter, red_list, blue_list):
         spawn.r_count -= 1
 
 
-def bullet(shooter):
-    if random.randrange(0, 100) <= 2:
-        bul = shooter.clone()
-        bul.color("black")
-        bul.seth(shooter.heading())
-        travel = 0
-        while travel < 550:
-            bul.forward(5)
-            bul.pos()
-            travel += 5
-        if random.randrange(2) == 1:
-            make_real_bullet(bul, shooter, spawn.red_list, spawn.blue_list)
-        else:
-            bul.hideturtle()
-            bul.clear()
-            del bul
-    else:
-        pass
-
-
-# Initial Spawn
-def spawn(amt):
-    spawn.red_list = []
-    spawn.blue_list = []
-    for _ in range(amt):
-        spawn.red_list.append(turtle.Turtle())
-        spawn.blue_list.append(turtle.Turtle())
-    spawn.r_count = 0
-    spawn.b_count = 0
-    # Red spawn
-    for r in spawn.red_list:  # noinspection PyRedeclaration
-        spawn.r_count += 1
-        r.color("red")
-        r.penup()
-        r.goto(random.randrange(-350, -125), random.randrange(-200, 200))
-    # Blue spawn
-    for b in spawn.blue_list:  # noinspection PyRedeclaration
-        spawn.b_count += 1
-        b.color("blue")
-        b.penup()
-        b.goto(random.randrange(125, 350), random.randrange(-200, 200))
-        b.seth(180)
-
-
 screen = turtle.Screen()
-# Main loop
+# Start
 # noinspection PyUnresolvedReferences
 if __name__ == '__main__':
     spawn(int(screen.numinput("Soldiers", "How many soldiers?", 6, 1, 100)))
@@ -170,6 +172,5 @@ if __name__ == '__main__':
                 _.penup()
                 _.hideturtle()
             firework.hideturtle()
-
 
 turtle.done()
