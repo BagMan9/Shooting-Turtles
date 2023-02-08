@@ -1,7 +1,16 @@
 import random
 import turtle
-import asyncio
-import threading
+import time
+
+
+def main():
+    movement(spawn.red_list, spawn.blue_list)
+    if spawn.r_count != 0:
+        bullet(random.choice(spawn.red_list))
+    if spawn.b_count != 0:
+        bullet(random.choice(spawn.blue_list))
+    else:
+        pass
 
 
 def movement(red, blue):
@@ -13,27 +22,59 @@ def movement(red, blue):
     b_turtle.seth(random.randrange(155, 205))
 
 
+def make_real_bullet(bul, shooter, red_list, blue_list):
+    if shooter.color()[0] == "red":
+        target = random.choice(blue_list)
+        for _ in range(10):
+            bul.color("red")
+            time.sleep(0.1)
+            bul.color("black")
+        bul.seth(bul.towards(target.pos()))
+        bul.pendown()
+        bul.speed(10000)
+        bul.goto(target.pos())
+        bul.clear()
+        target.clear()
+        bul.hideturtle()
+        target.hideturtle()
+        spawn.blue_list.remove(target)
+        spawn.b_count -= 1
+    elif shooter.color()[0] == "blue":
+        target = random.choice(red_list)
+        for _ in range(20):
+            bul.color("red")
+            time.sleep(0.1)
+            bul.color("black")
+        bul.seth(bul.towards(target.pos()))
+        bul.pendown()
+        bul.speed(10000)
+        bul.goto(target.pos())
+        bul.clear()
+        target.clear()
+        bul.hideturtle()
+        target.hideturtle()
+        spawn.red_list.remove(target)
+        spawn.r_count -= 1
+
+
 def bullet(shooter):
-    if random.randrange(0, 50) <= 5:
+    if random.randrange(0, 100) <= 2:
         bul = shooter.clone()
         bul.color("black")
         bul.seth(shooter.heading())
         travel = 0
-        while travel < 700:
+        while travel < 550:
             bul.forward(5)
             bul.pos()
             travel += 5
-        bul.hideturtle()
-        bul.clear()
-        del bul
+        if random.randrange(2) == 1:
+            make_real_bullet(bul, shooter, spawn.red_list, spawn.blue_list)
+        else:
+            bul.hideturtle()
+            bul.clear()
+            del bul
     else:
         pass
-
-
-# Simulation loop
-
-# def main(red, blue):
-#    pass
 
 
 # Initial Spawn
@@ -60,14 +101,75 @@ def spawn(amt):
         b.seth(180)
 
 
-
-
-# Main loop
-spawn(4)
-# noinspection PyUnresolvedReferences
-while spawn.r_count > 0 and spawn.b_count > 0:  # noinspection PyUnresolvedReferences
-    movement(spawn.red_list, spawn.blue_list)
-
-
 screen = turtle.Screen()
+# Main loop
+# noinspection PyUnresolvedReferences
+if __name__ == '__main__':
+    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 6, 1, 100)))
+    while spawn.r_count > 0 and spawn.b_count > 0:
+        main()
+    turtle.clearscreen()
+    del spawn.red_list
+    del spawn.blue_list
+    explosion = []
+    if spawn.r_count == 0:
+        turtle.write("Blue Wins!", font=("Arial", 30, "normal"), align="center")
+        while True:
+            firework = turtle.Turtle()
+            firework.color("blue")
+            firework.penup()
+            firework.seth(90)
+            firework.goto(random.randrange(-275, 275), -100)
+            firework.speed(1)
+            firework.forward(random.randrange(200, 350))
+            firework.hideturtle()
+            count = random.randrange(6, 9)
+            for _ in range(count):
+                explosion.append(firework.clone())
+            angle = 360 / count
+            increment = 0
+            for _ in explosion:
+                _ = firework.clone()
+                _.color("blue")
+                _.pendown()
+                _.speed(10)
+                if angle * increment == 360:
+                    break
+                _.left(angle * increment)
+                _.forward(random.randrange(25, 40))
+                increment += 1
+                _.penup()
+                _.hideturtle()
+            firework.hideturtle()
+    elif spawn.b_count == 0:
+        turtle.write("Red Wins!", font=("Arial", 30, "normal"), align="center")
+        while True:
+            firework = turtle.Turtle()
+            firework.color("red")
+            firework.penup()
+            firework.seth(90)
+            firework.goto(random.randrange(-275, 275), -100)
+            firework.speed(1)
+            firework.forward(random.randrange(200, 350))
+            count = random.randrange(6, 9)
+            firework.hideturtle()
+            for _ in range(count):
+                explosion.append(firework.clone())
+            angle = 360 / count
+            increment = 0
+            for _ in explosion:
+                _ = firework.clone()
+                _.color("red")
+                _.pendown()
+                _.speed(10)
+                if angle * increment == 360:
+                    break
+                _.left(angle * increment)
+                _.forward(random.randrange(25, 40))
+                increment += 1
+                _.penup()
+                _.hideturtle()
+            firework.hideturtle()
+
+
 turtle.done()
