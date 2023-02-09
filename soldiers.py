@@ -116,7 +116,7 @@ screen = turtle.Screen()
 # Start
 # noinspection PyUnresolvedReferences
 if __name__ == '__main__':
-    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 5, 1, 100)))
+    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 7, 1, 100)))
     while spawn.r_count > 0 and spawn.b_count > 0:
         main()
     turtle.clearscreen()
