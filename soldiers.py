@@ -4,120 +4,131 @@ import time
 from threading import Thread
 
 
-# Initial Spawn
-def spawn(amt):
-    spawn.red_list = []
-    spawn.blue_list = []
-    for _ in range(amt):
-        spawn.red_list.append(turtle.Turtle())
-        spawn.blue_list.append(turtle.Turtle())
-    spawn.r_count = 0
-    spawn.b_count = 0
-    # Red spawn
-    for r in spawn.red_list:  # noinspection PyRedeclaration
-        spawn.r_count += 1
-        r.color("red")
-        r.penup()
-        r.goto(random.randrange(-350, -125), random.randrange(-200, 200))
-    # Blue spawn
-    for b in spawn.blue_list:  # noinspection PyRedeclaration
-        spawn.b_count += 1
-        b.color("blue")
-        b.penup()
-        b.goto(random.randrange(125, 350), random.randrange(-200, 200))
-        b.seth(180)
+class RedSoldiers:
+    def __init__(self, amt):
+        self.soldiers = []
+        self.amt = amt
+        self.spawn()
+
+    def spawn(self):
+        for _ in range(self.amt):
+            self.soldiers.append(turtle.Turtle())
+        for s in self.soldiers:
+            s.color("red")
+            s.penup()
+            s.goto(random.randrange(-350, -125), random.randrange(-200, 200))
+            s.seth(0)
+
+    def movement(self):
+        for s in self.soldiers:
+            s.forward(random.randrange(1, 5))
+            s.left(random.randrange(-25, 25))
+            if s.heading() > 340 or s.heading() < 20:
+                s.seth(random.randrange(0, 25))
+            if s.pos()[0] > 350 or s.pos()[0] < -350 or s.pos()[1] > 200 or s.pos()[1] < -200:
+                s.goto(random.randrange(-350, -125), random.randrange(-200, 200))
+                s.seth(0)
+        if random.randrange(100) == 1:
+            Bullet(random.choice(self.soldiers))
 
 
-# Main loop
-def main():
-    movement(spawn.red_list, spawn.blue_list)
-    if spawn.r_count != 0:
-        bullet(random.choice(spawn.red_list))
-    if spawn.b_count != 0:
-        bullet(random.choice(spawn.blue_list))
+class BlueSoldiers:
+    def __init__(self, amt):
+        self.soldiers = []
+        self.amt = amt
+        self.spawn()
+
+    def spawn(self):
+        for _ in range(self.amt):
+            self.soldiers.append(turtle.Turtle())
+        for s in self.soldiers:
+            s.color("blue")
+            s.penup()
+            s.goto(random.randrange(125, 350), random.randrange(-200, 200))
+            s.seth(0)
+
+    def movement(self):
+        for s in self.soldiers:
+            s.forward(random.randrange(0, 5))
+            s.left(random.randrange(-25, 25))
+            if s.heading() > 160 or s.heading() < 200:
+                s.seth(random.randrange(0, 25))
+            if s.pos()[0] > 350 or s.pos()[0] < -350 or s.pos()[1] > 200 or s.pos()[1] < -200:
+                s.goto(random.randrange(350, 125), random.randrange(-200, 200))
+                s.seth(0)
+        if random.randrange(100) == 1:
+            Bullet(random.choice(self.soldiers))
 
 
-# Random movement
-def movement(red, blue):
-    r_turtle = random.choice(red)
-    if 20 < r_turtle.heading() < 340:
-        r_turtle.seth(random.randrange(0, 25))
-    r_turtle.left(random.randrange(-25, 25))
-    b_turtle = random.choice(blue)
-    b_turtle.seth(random.randrange(155, 205))
+class Bullet:
+    def __init__(self, shooter):
+        self.shooter = shooter
+        self.bul = self.shooter.clone()
+        self.bul.color("black")
+        self.bul.seth(self.shooter.heading())
+        self.dist = 0
+        self.travel()
 
-
-# Main bullet function
-def bullet(shooter):
-    if random.randrange(0, 100) <= 10:
-        bul = shooter.clone()
-        bul.color("black")
-        bul.seth(shooter.heading())
-        travel = 0
-        while travel < 550:
-            bul.forward(5)
-            bul.pos()
-            travel += 5
-            if bul.pos()[0] > 350 or bul.pos()[0] < -350 or bul.pos()[1] > 200 or bul.pos()[1] < -200:
+    def travel(self):
+        while self.dist < 550:
+            self.bul.forward(5)
+            self.bul.pos()
+            self.travel += 5
+            if self.bul.pos()[0] > 350 or self.bul.pos()[0] < -350 \
+                    or self.bul.pos()[1] > 200 or self.bul.pos()[1] < -200:
                 break
         if random.randrange(3) == 1:
-            make_real_bullet(bul, shooter, spawn.red_list, spawn.blue_list)
+            self.make_real_bullet("blue")
         else:
-            bul.hideturtle()
-            bul.clear()
-            del bul
-    else:
-        pass
+            self.bul.hideturtle()
+            self.bul.clear()
+            del self.bul
 
-
-# Bullet / soldier destruction
-def make_real_bullet(bul, shooter, red_list, blue_list):
-    if shooter.color()[0] == "red":
-        target = random.choice(blue_list)
-        bul.seth(bul.towards(target.pos()))
-        for _ in range(10):
-            bul.color("orange")
-            time.sleep(0.1)
-            bul.color("black")
-        bul.pendown()
-        bul.speed(10000)
-        bul.goto(target.pos())
-        bul.clear()
-        target.clear()
-        bul.hideturtle()
-        target.hideturtle()
-        spawn.blue_list.remove(target)
-        spawn.b_count -= 1
-    elif shooter.color()[0] == "blue":
-        target = random.choice(red_list)
-        bul.seth(bul.towards(target.pos()))
-        for _ in range(20):
-            bul.color("orange")
-            time.sleep(0.1)
-            bul.color("black")
-        bul.pendown()
-        bul.speed(10000)
-        bul.goto(target.pos())
-        bul.clear()
-        target.clear()
-        bul.hideturtle()
-        target.hideturtle()
-        spawn.red_list.remove(target)
-        spawn.r_count -= 1
+    def make_real_bullet(self, target_color):
+        if target_color == "red":
+            target = random.choice(RedSoldiers.soldiers)
+            self.bul.seth(self.bul.towards(target.pos()))
+            for _ in range(10):
+                self.bul.color("orange")
+                time.sleep(0.1)
+                self.bul.color("black")
+            self.bul.pendown()
+            self.bul.speed(10000)
+            self.bul.goto(target.pos())
+            self.bul.clear()
+            target.clear()
+            self.bul.hideturtle()
+            target.hideturtle()
+            RedSoldiers.soldiers.remove(target)
+        elif target_color == "blue":
+            target = random.choice(BlueSoldiers.soldiers)
+            self.bul.seth(self.bul.towards(target.pos()))
+            for _ in range(20):
+                self.bul.color("orange")
+                time.sleep(0.1)
+                self.bul.color("black")
+            self.bul.pendown()
+            self.bul.speed(10000)
+            self.bul.goto(target.pos())
+            self.bul.clear()
+            target.clear()
+            self.bul.hideturtle()
+            target.hideturtle()
+            BlueSoldiers.soldiers.remove(target)
 
 
 screen = turtle.Screen()
 # Start
 # noinspection PyUnresolvedReferences
 if __name__ == '__main__':
-    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 6, 1, 100)))
-    while spawn.r_count > 0 and spawn.b_count > 0:
-        main()
+    RedSoldiers(10)
+    BlueSoldiers(10)
+    while RedSoldiers.soldiers and BlueSoldiers.soldiers:
+        RedSoldiers.movement(RedSoldiers.soldiers)
+        BlueSoldiers.movement(BlueSoldiers.soldiers)
     turtle.clearscreen()
-    del spawn.red_list
-    del spawn.blue_list
     explosion = []
-    if spawn.r_count == 0:
+    if len(RedSoldiers.soldiers) == 0:
         turtle.write("Blue Wins!", font=("Arial", 30, "normal"), align="center")
         while True:
             firework = turtle.Turtle()
@@ -146,7 +157,7 @@ if __name__ == '__main__':
                 _.penup()
                 _.hideturtle()
             firework.hideturtle()
-    elif spawn.b_count == 0:
+    elif len(BlueSoldiers.soldiers) == 0:
         turtle.write("Red Wins!", font=("Arial", 30, "normal"), align="center")
         while True:
             firework = turtle.Turtle()
