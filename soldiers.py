@@ -1,6 +1,7 @@
 import random
 import turtle
 import time
+from threading import Thread
 
 
 # Initial Spawn
@@ -48,7 +49,7 @@ def movement(red, blue):
 
 # Main bullet function
 def bullet(shooter):
-    if random.randrange(0, 100) <= 2:
+    if random.randrange(0, 100) <= 10:
         bul = shooter.clone()
         bul.color("black")
         bul.seth(shooter.heading())
@@ -57,7 +58,9 @@ def bullet(shooter):
             bul.forward(5)
             bul.pos()
             travel += 5
-        if random.randrange(2) == 1:
+            if bul.pos()[0] > 350 or bul.pos()[0] < -350 or bul.pos()[1] > 200 or bul.pos()[1] < -200:
+                break
+        if random.randrange(3) == 1:
             make_real_bullet(bul, shooter, spawn.red_list, spawn.blue_list)
         else:
             bul.hideturtle()
@@ -71,11 +74,11 @@ def bullet(shooter):
 def make_real_bullet(bul, shooter, red_list, blue_list):
     if shooter.color()[0] == "red":
         target = random.choice(blue_list)
+        bul.seth(bul.towards(target.pos()))
         for _ in range(10):
-            bul.color("red")
+            bul.color("orange")
             time.sleep(0.1)
             bul.color("black")
-        bul.seth(bul.towards(target.pos()))
         bul.pendown()
         bul.speed(10000)
         bul.goto(target.pos())
@@ -87,11 +90,11 @@ def make_real_bullet(bul, shooter, red_list, blue_list):
         spawn.b_count -= 1
     elif shooter.color()[0] == "blue":
         target = random.choice(red_list)
+        bul.seth(bul.towards(target.pos()))
         for _ in range(20):
-            bul.color("red")
+            bul.color("orange")
             time.sleep(0.1)
             bul.color("black")
-        bul.seth(bul.towards(target.pos()))
         bul.pendown()
         bul.speed(10000)
         bul.goto(target.pos())
