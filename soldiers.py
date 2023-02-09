@@ -43,7 +43,13 @@ def movement(red, blue):
     if 20 < r_turtle.heading() < 340:
         r_turtle.seth(random.randrange(0, 25))
     r_turtle.left(random.randrange(-25, 25))
+    r_turtle.forward(random.randrange(4, 10))
+    if r_turtle.pos()[0] < -350 or r_turtle.pos()[1] > 200 or r_turtle.pos()[1] < -200:
+        r_turtle.goto(random.randrange(-350, -125), random.randrange(-200, 200))
     b_turtle = random.choice(blue)
+    b_turtle.forward(random.randrange(4, 10))
+    if b_turtle.pos()[0] > 350 or b_turtle.pos()[1] > 200 or b_turtle.pos()[1] < -200:
+        b_turtle.goto(random.randrange(125, 350), random.randrange(-200, 200))
     b_turtle.seth(random.randrange(155, 205))
 
 
@@ -110,7 +116,7 @@ screen = turtle.Screen()
 # Start
 # noinspection PyUnresolvedReferences
 if __name__ == '__main__':
-    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 6, 1, 100)))
+    spawn(int(screen.numinput("Soldiers", "How many soldiers?", 5, 1, 100)))
     while spawn.r_count > 0 and spawn.b_count > 0:
         main()
     turtle.clearscreen()
